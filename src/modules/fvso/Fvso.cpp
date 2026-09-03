@@ -334,7 +334,25 @@ bool Fvso::UpdateSensorDatas(MeasurementStates &z)
 
 bool Fvso::UpdateEquPitchInput(float &equ_pitch_input)
 {
-	/**/
+	/* Obtain the latest real left/right servo angles */
+	if (!_servo_angle_real_state_sub.update(&_servo_angle_real_state)) {
+		return false;
+	}
+
+	const float left_angle = _servo_angle_real_state.left_angle;
+	const float right_angle = _servo_angle_real_state.right_angle;
+
+	/* Check whether both servo angles are valid */
+	if (!std::isfinite(left_angle) || !std::isfinite(right_angle)) {
+		return false;
+	}
+
+	equ_pitch_input = 0.5f * (left_angle + right_angle);
+
+	if (!std::isfinite(equ_pitch_input)) {
+		return false;
+	}
+
 	return true;
 }
 

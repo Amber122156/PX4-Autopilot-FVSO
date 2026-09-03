@@ -202,13 +202,13 @@ private:
 	vehicle_local_position_s _vehicle_local_position{};
 	vehicle_angular_velocity_s _vehicle_angular_velocity{};
 	vehicle_attitude_s _vehicle_attitude{};
+	/* Cache the latest real left/right servo angles */
+	servo_angle_real_state_s _servo_angle_real_state{};
 
 	/* Record whether each topic has been updated since the last complete z(k) was used */
 	bool _local_position_updated{false};
 	bool _angular_velocity_updated{false};
 	bool _attitude_updated{false};
-
-	/* Get EquPitchInput */
 
 	/* Publish states by PX4: Publish states to controller */
 	uORB::Publication<fvso_state_s> _fvso_state_pub{ORB_ID(fvso_state)};
