@@ -89,6 +89,8 @@ set(msg_files
 	FollowTargetEstimator.msg
 	FollowTargetStatus.msg
 	FvsoState.msg
+	ServoAngleSetpoint.msg
+	ServoAngleState.msg
 	GeneratorStatus.msg
 	GeofenceResult.msg
 	GimbalDeviceAttitudeStatus.msg

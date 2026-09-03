@@ -98,7 +98,8 @@ struct DiscreteFormMatrices
     	matrix::Matrix<float, 4, 12>  C_ex_s;
     	matrix::Matrix<float, 12, 12> Q_ex_s;
     	matrix::Matrix<float, 4, 4>   R_l_s;
-
+	matrix::Matrix<float, 12, 12> A_ex_s_T;
+	matrix::Matrix<float, 12, 4> C_ex_s_T;
 };
 
 struct InnerVariables
@@ -208,6 +209,15 @@ private:
 
 	/* Publish states by PX4: Publish states to controller */
 	uORB::Publication<fvso_state_s> _fvso_state_pub{ORB_ID(fvso_state)};
+
+	/* ------------ To optimize the stack space during matrix runtime ----------- */
+	matrix::Matrix<float, 4, 12> _CP;
+	matrix::Matrix<float, 12, 4> _PCt;
+
+	matrix::SquareMatrix<float, 4> _innovation_cov;
+	matrix::SquareMatrix<float, 4> _innovation_cov_inv;
+
+	matrix::Vector<float, 4> _innovation;
 public:
 	Fvso();
 	~Fvso() override;

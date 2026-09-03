@@ -79,7 +79,7 @@ int Fvso::custom_command(int argc, char *argv[])
 
 int Fvso::print_usage(const char *reason)
 {
-	/**/
+	return 0;
 }
 
 extern "C" __EXPORT int fvso_main(int argc, char *argv[])
@@ -179,7 +179,7 @@ void Fvso::Prediction(float equ_pitch_input)
 	   x_pred = A_ex_s * x_est + B_ex_s * delta_e
 	   p_pred = A_ex_s * p_est * A_ex_s^T + Q_ex_s */
 	FVSO_InnerVariables.x_pred = FVSO_DiscreteFormMatrices.A_ex_s * FVSO_InnerVariables.x_est + FVSO_DiscreteFormMatrices.B_ex_s * equ_pitch_input;
-	FVSO_InnerVariables.p_pred = FVSO_DiscreteFormMatrices.A_ex_s * FVSO_InnerVariables.p_est * FVSO_DiscreteFormMatrices.A_ex_s.transpose() + FVSO_DiscreteFormMatrices.Q_ex_s;
+	FVSO_InnerVariables.p_pred = FVSO_DiscreteFormMatrices.A_ex_s * FVSO_InnerVariables.p_est * FVSO_DiscreteFormMatrices.A_ex_s_T + FVSO_DiscreteFormMatrices.Q_ex_s;
 }
 
 bool Fvso::Estimation(const MeasurementStates &z)
@@ -192,27 +192,42 @@ bool Fvso::Estimation(const MeasurementStates &z)
 	z_vec(3) = z.theta;
 
 	/* K = p_pred * C_ex_s^T  * (C_ex_s * p_pred * C_ex_s^T + R_l_s)^(-1) */
-	matrix::SquareMatrix<float, 4> innovation_cov;
-	innovation_cov = FVSO_DiscreteFormMatrices.C_ex_s * FVSO_InnerVariables.p_pred * FVSO_DiscreteFormMatrices.C_ex_s.transpose() + FVSO_DiscreteFormMatrices.R_l_s;
-	matrix::SquareMatrix<float, 4> innovation_cov_inv;
-	if (!matrix::inv(innovation_cov, innovation_cov_inv)) {
+	_CP = FVSO_DiscreteFormMatrices.C_ex_s * FVSO_InnerVariables.p_pred;
+	_innovation_cov = _CP * FVSO_DiscreteFormMatrices.C_ex_s_T;
+	_innovation_cov += FVSO_DiscreteFormMatrices.R_l_s;
+
+	if (!matrix::inv(_innovation_cov, _innovation_cov_inv)) {
 		PX4_ERR("FVSO innovation covariance inversion failed");
 		return false;
 	}
-	FVSO_InnerVariables.K = FVSO_InnerVariables.p_pred * FVSO_DiscreteFormMatrices.C_ex_s.transpose() * innovation_cov_inv;
+
+	_PCt = FVSO_InnerVariables.p_pred * FVSO_DiscreteFormMatrices.C_ex_s_T;
+	FVSO_InnerVariables.K = _PCt * _innovation_cov_inv;
 
 	/* innovation = z- C_ex_s * x_pred
 	   X_est = x_pred + k * innovation */
 	const matrix::Vector<float,4> innovation = z_vec - FVSO_DiscreteFormMatrices.C_ex_s * FVSO_InnerVariables.x_pred;
 	FVSO_InnerVariables.x_est = FVSO_InnerVariables.x_pred + FVSO_InnerVariables.K * innovation;
 
+	_innovation =  z_vec - FVSO_DiscreteFormMatrices.C_ex_s * FVSO_InnerVariables.x_pred;
+
+	FVSO_InnerVariables.x_est = FVSO_InnerVariables.x_pred + FVSO_InnerVariables.K * _innovation;
+
 	/* p_est = (I - k * C_ex_s ) * p_pred */
-	matrix::Matrix<float,12,12> identity;
-	identity.setZero();
-	for(int i = 0; i < 12; i++){
-		identity(i,i) = 1.0f;
+	for (int i = 0; i < 12; i++) {
+
+		for (int j = 0; j < 12; j++) {
+
+			float correction = 0.0f;
+
+			for (int k = 0; k < 4; k++) {
+				correction +=
+				FVSO_InnerVariables.K(i, k) * _CP(k, j);
+			}
+
+			FVSO_InnerVariables.p_est(i, j) = FVSO_InnerVariables.p_pred(i, j) - correction;
+		}
 	}
-	FVSO_InnerVariables.p_est = (identity - FVSO_InnerVariables.K * FVSO_DiscreteFormMatrices.C_ex_s) * FVSO_InnerVariables.p_pred;
 
 	return true;
 }
@@ -320,6 +335,7 @@ bool Fvso::UpdateSensorDatas(MeasurementStates &z)
 bool Fvso::UpdateEquPitchInput(float &equ_pitch_input)
 {
 	/**/
+	return true;
 }
 
 void Fvso::PublishState()
@@ -478,6 +494,8 @@ void Fvso::BuildDiscreteFormMatrices()
 		FVSO_DiscreteFormMatrices.A_ex_s(i, i) += 1.0f;
 	}
 
+	FVSO_DiscreteFormMatrices.A_ex_s_T = FVSO_DiscreteFormMatrices.A_ex_s.transpose();
+
 	/* ------------------------------ Build B_ex_s ------------------------------ */
 	/* B_ex_s = B_ex * T */
 	for (int i = 0; i < 12; i++) {
@@ -494,6 +512,8 @@ void Fvso::BuildDiscreteFormMatrices()
 			FVSO_DiscreteFormMatrices.C_ex_s(i, j) = FVSO_ContinuousMatrices.C_ex(i, j);
 		}
 	}
+
+	FVSO_DiscreteFormMatrices.C_ex_s_T = FVSO_DiscreteFormMatrices.C_ex_s.transpose();
 
 	/* ------------------------------ Build Q_ex_s ------------------------------ */
 	/* Q_ex_s = Gamma_ex * Q_ex * Gamma_ex^T * T */
