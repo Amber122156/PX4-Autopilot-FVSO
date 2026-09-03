@@ -4,13 +4,14 @@
 #include <px4_platform_common/module_params.h>
 #include <px4_platform_common/px4_work_queue/ScheduledWorkItem.hpp>
 
+#include <drivers/drv_hrt.h>
+
 #include <uORB/Publication.hpp>
 #include <uORB/SubscriptionCallback.hpp>
 
 #include <uORB/topics/servo_angle_setpoint.h>
 #include <uORB/topics/servo_angle_state.h>
 
-#include "../Params/ServoModelParams.hpp"
 
 class ServoModel :
 	public ModuleBase<ServoModel>,

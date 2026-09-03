@@ -206,9 +206,6 @@ bool Fvso::Estimation(const MeasurementStates &z)
 
 	/* innovation = z- C_ex_s * x_pred
 	   X_est = x_pred + k * innovation */
-	const matrix::Vector<float,4> innovation = z_vec - FVSO_DiscreteFormMatrices.C_ex_s * FVSO_InnerVariables.x_pred;
-	FVSO_InnerVariables.x_est = FVSO_InnerVariables.x_pred + FVSO_InnerVariables.K * innovation;
-
 	_innovation =  z_vec - FVSO_DiscreteFormMatrices.C_ex_s * FVSO_InnerVariables.x_pred;
 
 	FVSO_InnerVariables.x_est = FVSO_InnerVariables.x_pred + FVSO_InnerVariables.K * _innovation;

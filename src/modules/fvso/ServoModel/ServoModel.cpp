@@ -37,7 +37,7 @@ bool ServoModel::init()
 
 	_have_setpoint = false;
 
-	/* ------------------------- Start Periodic Update ------------------------- */
+	/* ---------------------- Register Setpoint Callback ----------------------- */
 
 	if (!_servo_angle_setpoint_sub.registerCallback()) {
 		PX4_ERR("failed to register servo setpoint callback");
