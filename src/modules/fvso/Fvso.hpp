@@ -13,6 +13,7 @@
 #include <uORB/topics/vehicle_angular_velocity.h>
 #include <uORB/topics/vehicle_attitude.h>
 #include <uORB/topics/fvso_state.h>
+#include <uORB/topics/servo_angle_real_state.h>
 
 struct MeasurementStates
 {
@@ -194,6 +195,8 @@ private:
     	uORB::Subscription _vehicle_angular_velocity_sub{ORB_ID(vehicle_angular_velocity)};
 	/* theta: attitude quaternion -> pitch angle */
     	uORB::Subscription _vehicle_attitude_sub{ORB_ID(vehicle_attitude)};
+	/* Get real servo angle as Equ_input */
+	uORB::Subscription _servo_angle_real_state_sub{ORB_ID(servo_angle_real_state)};
 
 	/* Cache the latest data from each required PX4 topic */
 	vehicle_local_position_s _vehicle_local_position{};
