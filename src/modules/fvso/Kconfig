@@ -1,0 +1,5 @@
+menuconfig MODULES_FVSO
+    bool "fvso"
+    default n
+    ---help---
+        Enable support for FVSO

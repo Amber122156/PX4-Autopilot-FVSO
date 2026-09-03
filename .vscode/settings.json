@@ -7,13 +7,14 @@
         "C_Cpp.default.browse.limitSymbolsToIncludedHeaders": true,
         "C_Cpp.default.cppStandard": "c++14",
         "C_Cpp.default.cStandard": "c11",
+        "C_Cpp.default.compileCommands": "${workspaceFolder}/build/micoair_h743-v2_default/compile_commands.json",
         "C_Cpp.formatting": "Disabled",
         "C_Cpp.intelliSenseEngine": "Default",
         "C_Cpp.vcpkg.enabled": false,
         "C_Cpp.workspaceParsingPriority": "low",
         "cmake.buildBeforeRun": true,
         "cmake.buildDirectory": "${workspaceFolder}/build/${variant:CONFIG}",
-        "cmake.configureOnOpen": true,
+        "cmake.configureOnOpen": false,
         "cmake.ctest.parallelJobs": 1,
         "cmake.skipConfigureIfCachePresent": true,
         "cmakeExplorer.buildDir": "${workspaceFolder}/build/px4_sitl_test",
@@ -127,5 +128,13 @@
         "terminal.integrated.scrollback": 15000,
         "yaml.schemas": {
                 "${workspaceFolder}/validation/module_schema.yaml": "${workspaceFolder}/src/modules/*/module.yaml"
-        }
+        },
+        "python.autoComplete.extraPaths": [
+                "/opt/ros/humble/lib/python3.10/site-packages",
+                "/opt/ros/humble/local/lib/python3.10/dist-packages"
+        ],
+        "python.analysis.extraPaths": [
+                "/opt/ros/humble/lib/python3.10/site-packages",
+                "/opt/ros/humble/local/lib/python3.10/dist-packages"
+        ]
 }
