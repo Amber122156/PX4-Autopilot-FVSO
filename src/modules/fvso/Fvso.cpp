@@ -1,5 +1,7 @@
 #include <cmath>
 
+#include <drivers/drv_hrt.h>>
+
 #include <modules/fvso/Fvso.hpp>
 #include <modules/fvso/Params/FvsoParams.hpp>
 
@@ -355,7 +357,21 @@ bool Fvso::UpdateEquPitchInput(float &equ_pitch_input)
 
 void Fvso::PublishState()
 {
-	/**/
+	fvso_state_s msg{};
+
+	/* Publication timestamp */
+	msg.timestamp = hrt_absolute_time();
+
+	msg.timestamp_sample = msg.timestamp;
+
+	/* x_est = [x_l, x_n]^T
+	   x_l = [u, w, q, theta]^T */
+	msg.u = FVSO_InnerVariables.x_est(0);
+	msg.w = FVSO_InnerVariables.x_est(1);
+	msg.q = FVSO_InnerVariables.x_est(2);
+	msg.theta = FVSO_InnerVariables.x_est(3);
+
+	_fvso_state_pub.publish(msg);
 }
 
 /* ---------------------------- Model Preparation --------------------------- */
