@@ -1,0 +1,63 @@
+#pragma once
+
+#include <px4_platform_common/module.h>
+#include <px4_platform_common/module_params.h>
+#include <px4_platform_common/px4_work_queue/ScheduledWorkItem.hpp>
+
+#include <matrix/matrix/math.hpp>
+
+#include <uORB/Publication.hpp>
+#include <uORB/SubscriptionCallback.hpp>
+
+#include <uORB/topics/fvso_state.h>
+#include <uORB/topics/servo_angle_setpoint.h>
+
+
+class FVSOController :
+	public ModuleBase<FVSOController>,
+	public ModuleParams,
+	public px4::ScheduledWorkItem
+{
+private:
+
+	void Run() override;
+
+	/* -------------------------- Controller Algorithm ------------------------- */
+	void Initialization();
+	float Control();
+
+	/* ----------------------------- Runtime States ---------------------------- */
+
+	/* FVSO estimated longitudinal state:
+	   x_l = [u, w, q, theta]^T */
+	matrix::Vector<float, 4> x_l{};
+
+	/* Integral state in Eq.(67) */
+	matrix::Vector<float, 4> x_in{};
+
+	/* Equivalent pitch control input u(k) */
+	float _equ_pitch_input{0.0f};
+
+	bool _initialized{false};
+
+
+	/* ------------------------------ uORB Input ------------------------------- */
+	/* FVSOController is triggered whenever a new FVSO state is published */
+	uORB::SubscriptionCallbackWorkItem _fvso_state_sub{this,ORB_ID(fvso_state)};
+
+	/* ------------------------------ uORB Output ------------------------------ */
+	uORB::Publication<servo_angle_setpoint_s> _servo_angle_setpoint_pub{ORB_ID(servo_angle_setpoint)};
+
+public:
+
+	FVSOController();
+	~FVSOController() override;
+
+	static int task_spawn(int argc, char *argv[]);
+	static int custom_command(int argc, char *argv[]);
+	static int print_usage(const char *reason = nullptr);
+
+	bool init();
+
+	int print_status() override;
+};

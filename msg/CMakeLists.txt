@@ -88,7 +88,8 @@ set(msg_files
 	FollowTarget.msg
 	FollowTargetEstimator.msg
 	FollowTargetStatus.msg
-	FvsoState.msg
+	LongitudinalState.msg
+	LongitudinalStateSetpoint.msg
 	ServoAngleRealState.msg
 	ServoAngleSetpoint.msg
 	ServoAngleState.msg

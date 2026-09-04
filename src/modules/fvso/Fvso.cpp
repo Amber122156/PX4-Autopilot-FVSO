@@ -1,6 +1,6 @@
 #include <cmath>
 
-#include <drivers/drv_hrt.h>>
+#include <drivers/drv_hrt.h>
 
 #include <modules/fvso/Fvso.hpp>
 #include <modules/fvso/Params/FvsoParams.hpp>

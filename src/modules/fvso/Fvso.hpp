@@ -12,7 +12,7 @@
 #include <uORB/topics/vehicle_local_position.h>
 #include <uORB/topics/vehicle_angular_velocity.h>
 #include <uORB/topics/vehicle_attitude.h>
-#include <uORB/topics/fvso_state.h>
+
 #include <uORB/topics/servo_angle_real_state.h>
 
 struct MeasurementStates
