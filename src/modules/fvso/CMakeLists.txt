@@ -9,3 +9,4 @@ px4_add_module(
 )
 
 add_subdirectory(ServoModel)
+add_subdirectory(FVSOController)

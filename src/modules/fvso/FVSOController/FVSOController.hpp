@@ -9,7 +9,8 @@
 #include <uORB/Publication.hpp>
 #include <uORB/SubscriptionCallback.hpp>
 
-#include <uORB/topics/fvso_state.h>
+#include <uORB/topics/longitudinal_state.h>
+#include <uORB/topics/longitudinal_state_setpoint.h>
 #include <uORB/topics/servo_angle_setpoint.h>
 
 
@@ -27,9 +28,8 @@ private:
 	float Control();
 
 	/* ----------------------------- Runtime States ---------------------------- */
-
-	/* FVSO estimated longitudinal state:
-	   x_l = [u, w, q, theta]^T */
+	/* Current longitudinal state:
+	x_l = [u, w, q, theta]^T */
 	matrix::Vector<float, 4> x_l{};
 
 	/* Integral state in Eq.(67) */
@@ -42,8 +42,8 @@ private:
 
 
 	/* ------------------------------ uORB Input ------------------------------- */
-	/* FVSOController is triggered whenever a new FVSO state is published */
-	uORB::SubscriptionCallbackWorkItem _fvso_state_sub{this,ORB_ID(fvso_state)};
+	/* Controller is triggered whenever a new longitudinal state is published */
+	uORB::SubscriptionCallbackWorkItem _longitudinal_state_sub{this,ORB_ID(longitudinal_state)};
 
 	/* ------------------------------ uORB Output ------------------------------ */
 	uORB::Publication<servo_angle_setpoint_s> _servo_angle_setpoint_pub{ORB_ID(servo_angle_setpoint)};

@@ -357,7 +357,7 @@ bool Fvso::UpdateEquPitchInput(float &equ_pitch_input)
 
 void Fvso::PublishState()
 {
-	fvso_state_s msg{};
+	longitudinal_state_s msg{};
 
 	/* Publication timestamp */
 	msg.timestamp = hrt_absolute_time();
@@ -371,7 +371,7 @@ void Fvso::PublishState()
 	msg.q = FVSO_InnerVariables.x_est(2);
 	msg.theta = FVSO_InnerVariables.x_est(3);
 
-	_fvso_state_pub.publish(msg);
+	_longitudinal_state_pub.publish(msg);
 }
 
 /* ---------------------------- Model Preparation --------------------------- */

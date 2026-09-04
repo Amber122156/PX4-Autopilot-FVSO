@@ -12,7 +12,7 @@
 #include <uORB/topics/vehicle_local_position.h>
 #include <uORB/topics/vehicle_angular_velocity.h>
 #include <uORB/topics/vehicle_attitude.h>
-
+#include <uORB/topics/longitudinal_state.h>
 #include <uORB/topics/servo_angle_real_state.h>
 
 struct MeasurementStates
@@ -211,7 +211,7 @@ private:
 	bool _attitude_updated{false};
 
 	/* Publish states by PX4: Publish states to controller */
-	uORB::Publication<fvso_state_s> _fvso_state_pub{ORB_ID(fvso_state)};
+	uORB::Publication<longitudinal_state_s> _longitudinal_state_pub{ORB_ID(longitudinal_state)};
 
 	/* ------------ To optimize the stack space during matrix runtime ----------- */
 	matrix::Matrix<float, 4, 12> _CP;
